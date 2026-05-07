@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>AI Job Recommendation System</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body class="bg-light">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+        <div class="container">
+
+            <a class="navbar-brand fw-bold">
+
+                <i class="bi bi-briefcase-fill"></i>
+                AI Job Recommendation
+
+            </a>
+
+            <div>
+
+                <a href="/" class="btn btn-outline-light me-2">
+                    Home
+                </a>
+
+                <a href="/about" class="btn btn-outline-light me-2">
+                    About
+                </a>
+
+                <a href="/dashboard" class="btn btn-outline-success me-2">
+                    Dashboard
+                </a>
+
+                <a href="/history" class="btn btn-outline-info me-2">
+                    History
+                </a>
+
+                <a href="/login" class="btn btn-outline-warning me-2">
+                    Login
+                </a>
+
+                <a href="/signup" class="btn btn-warning me-2">
+                    Signup
+                </a>
+
+                <a href="/logout" class="btn btn-danger">
+                    Logout
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container mt-5">
+
+        <!-- Hero Section -->
+        <div class="bg-primary text-white text-center p-5 rounded shadow mb-5">
+
+            <h1 class="fw-bold">
+
+                AI-Based Career Recommendation
+
+            </h1>
+
+            <p class="lead">
+
+                Upload your resume and get AI-powered job matches instantly.
+
+            </p>
+
+        </div>
+
+        <!-- Upload Form -->
+        <div class="card shadow p-4 mb-5">
+
+            <form method="POST"
+                  enctype="multipart/form-data">
+
+                <input type="file"
+                       name="resume"
+                       class="form-control mb-3"
+                       required>
+
+                <button type="submit"
+                        class="btn btn-primary w-100">
+
+                    <i class="bi bi-upload"></i>
+                    Analyze Resume
+
+                </button>
+
+            </form>
+
+        </div>
+
+        {% if skills %}
+
+        <!-- Resume Score -->
+        <div class="card shadow p-4 mb-4">
+
+            <h2 class="mb-3">
+
+                <i class="bi bi-bar-chart-fill"></i>
+                Resume Score
+
+            </h2>
+
+            <div class="progress">
+
+                <div class="progress-bar bg-success"
+                     role="progressbar"
+                     style="width: {{ resume_score }}%;">
+
+                    {{ resume_score }}%
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Extracted Skills -->
+        <div class="card shadow p-4 mb-4">
+
+            <h2 class="mb-3">
+
+                <i class="bi bi-lightbulb-fill"></i>
+                Extracted Skills
+
+            </h2>
+
+            {% for skill in skills %}
+
+            <span class="badge bg-primary p-2 m-1">
+
+                {{ skill }}
+
+            </span>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- Recommended Jobs -->
+        <h2 class="mb-4">
+
+            <i class="bi bi-briefcase-fill"></i>
+            Recommended Jobs
+
+        </h2>
+
+        <div class="row">
+
+            {% for job in jobs %}
+
+            <div class="col-md-6 mb-4">
+
+                <div class="card shadow-sm p-4 h-100">
+
+                    <h3 class="text-primary">
+
+                        {{ job.job_title }}
+
+                    </h3>
+
+                    <p>
+
+                        <strong>Company:</strong>
+                        {{ job.company }}
+
+                    </p>
+
+                    <p>
+
+                        <strong>Location:</strong>
+                        {{ job.location }}
+
+                    </p>
+
+                    <p class="fw-bold text-success">
+
+                        Match Score:
+                        {{ job.match_score }}%
+
+                    </p>
+
+                    <a href="{{ job.redirect_url }}"
+                       target="_blank"
+                       class="btn btn-primary mt-2">
+
+                        <i class="bi bi-box-arrow-up-right"></i>
+                        Apply Now
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- Recommended Courses -->
+        <div class="card shadow p-4 mb-5">
+
+            <h2 class="mb-4">
+
+                <i class="bi bi-book-fill"></i>
+                Recommended Courses
+
+            </h2>
+
+            {% for course in courses %}
+
+            <div class="border rounded p-3 mb-3">
+
+                <h5>
+
+                    {{ course.skill }}
+
+                </h5>
+
+                <p>
+
+                    {{ course.course }}
+
+                </p>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- Charts Section -->
+        <div class="card shadow p-4 mb-5">
+
+            <h2 class="mb-4">
+
+                <i class="bi bi-bar-chart-line-fill"></i>
+                Analytics Dashboard
+
+            </h2>
+
+            <div class="row">
+
+                <!-- Resume Score Chart -->
+                <div class="col-md-6 mb-4">
+
+                    <canvas id="scoreChart"></canvas>
+
+                </div>
+
+                <!-- Job Match Chart -->
+                <div class="col-md-6 mb-4">
+
+                    <canvas id="jobChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center p-3 mt-5">
+
+        AI Job Recommendation System © 2026
+
+    </footer>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    {% if skills %}
+
+    <script>
+
+        // Resume Score Chart
+
+        const scoreCtx =
+            document.getElementById('scoreChart');
+
+        new Chart(scoreCtx, {
+
+            type: 'doughnut',
+
+            data: {
+
+                labels: [
+                    'Resume Score',
+                    'Remaining'
+                ],
+
+                datasets: [{
+
+                    data: [
+                        {{ resume_score }},
+                        {{ 100 - resume_score }}
+                    ],
+
+                    backgroundColor: [
+                        '#198754',
+                        '#dee2e6'
+                    ]
+
+                }]
+
+            }
+
+        });
+
+        // Job Match Chart
+
+        const jobCtx =
+            document.getElementById('jobChart');
+
+        new Chart(jobCtx, {
+
+            type: 'bar',
+
+            data: {
+
+                labels: [
+
+                    {% for job in jobs %}
+
+                    "{{ job.job_title }}",
+
+                    {% endfor %}
+
+                ],
+
+                datasets: [{
+
+                    label: 'Match Score %',
+
+                    data: [
+
+                        {% for job in jobs %}
+
+                        {{ job.match_score }},
+
+                        {% endfor %}
+
+                    ],
+
+                    backgroundColor: [
+                        '#0d6efd',
+                        '#198754',
+                        '#ffc107',
+                        '#dc3545',
+                        '#6610f2',
+                        '#20c997'
+                    ]
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        max: 100
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    </script>
+
+    {% endif %}
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
